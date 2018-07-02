@@ -1,0 +1,7 @@
+base   newdraft
+author njj
+email  niejijing@gmail.com
+date   2018-07-02
+name   newdraft plugin
+desc   article cache mechanism
+url    http://www.dokuwiki.org/plugin:imgpaste
