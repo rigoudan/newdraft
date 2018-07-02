@@ -6,4 +6,3 @@
 
 $meta['filename'] = array('string');
 $meta['cachesize'] = array('string');
-

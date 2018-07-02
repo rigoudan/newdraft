@@ -45,7 +45,7 @@ class action_plugin_newdraft extends DokuWiki_Action_Plugin {
 			$data = file_get_contents($SRC);
 		}
 		
-		$cachesize = intval(this->getConf('cachesize'));
+		$cachesize = intval($this->getConf('cachesize'));
 		
 		if(strlen($data) > $cachesize) {
 			$data = substr($data, -$cachesize/2);
@@ -88,6 +88,7 @@ class action_plugin_newdraft extends DokuWiki_Action_Plugin {
     }
 	
 	private function fetchFileName() {
+		global $INPUT;
 		$filename = $this->getConf('filename');
 		$filename = str_replace(
             array(
