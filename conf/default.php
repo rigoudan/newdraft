@@ -7,3 +7,4 @@
 
 $conf['filename'] = 'cache.doc';
 $conf['cachesize'] = '10000';
+$conf['interval'] = '5000';

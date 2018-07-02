@@ -31,57 +31,70 @@ class action_plugin_newdraft extends DokuWiki_Action_Plugin {
 
         global $INPUT;
 		
-		// get cache data
-		$cache_data = $INPUT->post->str('data');
-        if(!$cache_data) $this->fail(400, 'e_nodata');
+		$cache_state = $INPUT->post->str('state');
 		
-		$filename = $this->fetchFileName();
-		$SRC = mediaFN($filename);
-		if(!file_exists($SRC)){
-			//doesn't exist!
-			$data = "0";
+		if($cache_state == 'init') {
+			header('Content-Type: application/json');
+			$json = new JSON();
+			echo $json->encode(
+				array(
+					'period' => $this->getConf('interval')
+				)
+			);
 		}
 		else {
-			$data = file_get_contents($SRC);
-		}
-		
-		$cachesize = intval($this->getConf('cachesize'));
-		
-		if(strlen($data) > $cachesize) {
-			$data = substr($data, -$cachesize/2);
-		}
-		
-		$data .= $cache_data;
+			// get cache data
+			$cache_data = $INPUT->post->str('data');
+			if(!$cache_data) $this->fail(400, 'e_nodata');
+			
+			$filename = $this->fetchFileName();
+			$SRC = mediaFN($filename);
+			if(!file_exists($SRC)){
+				//doesn't exist!
+				$data = "0";
+			}
+			else {
+				$data = file_get_contents($SRC);
+			}
+			
+			$cachesize = intval($this->getConf('cachesize'));
+			
+			if(strlen($data) > $cachesize) {
+				$data = substr($data, -$cachesize/2);
+			}
+			
+			$data .= $cache_data;
 
-        // check ACLs
-        $auth = auth_quickaclcheck($filename);
-        if($auth < AUTH_UPLOAD) $this->fail(403, 'uploadfail');
-		
-		$tempname = $this->storetemp($data);
-        // do the actual saving
-        $result = media_save(
-                    array(
-                         'name' => $tempname,
-                         'mime' => "doc",
-                         'ext'  => ".doc"
-                    ),
-                    $filename,
-                    true,
-                    $auth,
-                    'copy'
-        );
-        //if(is_array($result)) $this->fail(500, $result[0]);
-		if(is_array($result)) $this->fail(500, 'lueluelue');
+			// check ACLs
+			$auth = auth_quickaclcheck($filename);
+			if($auth < AUTH_UPLOAD) $this->fail(403, 'uploadfail');
+			
+			$tempname = $this->storetemp($data);
+			// do the actual saving
+			$result = media_save(
+						array(
+							 'name' => $tempname,
+							 'mime' => "doc",
+							 'ext'  => ".doc"
+						),
+						$filename,
+						true,
+						$auth,
+						'copy'
+			);
+			//if(is_array($result)) $this->fail(500, $result[0]);
+			if(is_array($result)) $this->fail(500, 'lueluelue');
 
-        //Still here? We had a successful upload
-        $this->clean();
-        header('Content-Type: application/json');
-        $json = new JSON();
-        echo $json->encode(
-            array(
-                'message' => 'cache_success'
-            )
-        );
+			//Still here? We had a successful upload
+			$this->clean();
+			header('Content-Type: application/json');
+			$json = new JSON();
+			echo $json->encode(
+				array(
+					'message' => 'cache_success'
+				)
+			);
+		}
 
         $event->preventDefault();
         $event->stopPropagation();
